@@ -1,6 +1,6 @@
 """PDF generation for КП using fpdf2.
 
-Downloads DejaVu font on first use to support Cyrillic text.
+Downloads DejaVu fonts on first use to support Cyrillic text.
 """
 import os
 import urllib.request
@@ -9,7 +9,9 @@ from fpdf import FPDF
 
 FONT_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "fonts")
 FONT_PATH = os.path.join(FONT_DIR, "DejaVuSans.ttf")
-FONT_URL = "https://github.com/reingart/pyfpdf/raw/master/font/DejaVuSans.ttf"
+FONT_BOLD_PATH = os.path.join(FONT_DIR, "DejaVuSans-Bold.ttf")
+FONT_URL = "https://raw.githubusercontent.com/dejavu-fonts/dejavu-fonts/master/ttf/DejaVuSans.ttf"
+FONT_BOLD_URL = "https://raw.githubusercontent.com/dejavu-fonts/dejavu-fonts/master/ttf/DejaVuSans-Bold.ttf"
 PDF_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "pdfs")
 
 VAT_RATE = 0.12
@@ -18,9 +20,11 @@ VAT_RATE = 0.12
 def _ensure_font():
     os.makedirs(FONT_DIR, exist_ok=True)
     if not os.path.exists(FONT_PATH):
-        print(f"[PDF] Downloading DejaVu font to {FONT_PATH} ...")
+        print(f"[PDF] Downloading DejaVuSans.ttf ...")
         urllib.request.urlretrieve(FONT_URL, FONT_PATH)
-        print("[PDF] Font downloaded.")
+    if not os.path.exists(FONT_BOLD_PATH):
+        print(f"[PDF] Downloading DejaVuSans-Bold.ttf ...")
+        urllib.request.urlretrieve(FONT_BOLD_URL, FONT_BOLD_PATH)
 
 
 def _fmt_money(amount: float) -> str:
@@ -33,8 +37,8 @@ def generate_pdf(proposal) -> str:
 
     pdf = FPDF()
     pdf.add_page()
-    pdf.add_font("DejaVu", "", FONT_PATH, uni=True)
-    pdf.add_font("DejaVu", "B", FONT_PATH, uni=True)
+    pdf.add_font("DejaVu", "", FONT_PATH)
+    pdf.add_font("DejaVu", "B", FONT_BOLD_PATH)
 
     # Header
     pdf.set_font("DejaVu", "B", 16)

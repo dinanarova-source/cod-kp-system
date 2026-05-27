@@ -77,6 +77,7 @@ export interface Proposal {
   head_signed_at: string | null
   head_comment: string | null
   sent_at: string | null
+  pdf_path: string | null
   created_at: string
   items: ProposalItem[]
   history: HistoryEntry[]

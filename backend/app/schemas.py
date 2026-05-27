@@ -122,6 +122,7 @@ class ProposalResponse(BaseModel):
     head_signed_at: Optional[datetime] = None
     head_comment: Optional[str] = None
     sent_at: Optional[datetime] = None
+    pdf_path: Optional[str] = None
     created_at: datetime
     items: List[ProposalItemResponse]
     history: List[ProposalHistoryResponse]
