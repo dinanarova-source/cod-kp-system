@@ -1,5 +1,7 @@
 # ЦОД — Система управления КП
 
+[![GitHub](https://img.shields.io/badge/GitHub-cod--kp--system-blue?logo=github)](https://github.com/dinanarova-source/cod-kp-system)
+
 Внутренняя web-система для формирования коммерческих предложений (КП) из актуального прайс-листа ЦОД, с подписью ЭЦП и отправкой клиентам.
 
 ## Роли и тестовые аккаунты
