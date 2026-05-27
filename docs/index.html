@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ЦОД — Система управления коммерческими предложениями</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:    #1d4ed8;
+      --blue-dark: #1e3a8a;
+      --blue-light: #eff6ff;
+      --text:    #1e293b;
+      --muted:   #64748b;
+      --border:  #e2e8f0;
+      --white:   #ffffff;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text);
+      background: var(--white);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-logo { font-weight: 700; font-size: 1.1rem; color: var(--blue); }
+    .nav-links { display: flex; gap: 28px; font-size: 0.9rem; color: var(--muted); }
+    .nav-links a:hover { color: var(--blue); }
+    .nav-btn {
+      background: var(--blue); color: #fff;
+      padding: 8px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+      transition: background .2s;
+    }
+    .nav-btn:hover { background: var(--blue-dark); }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%);
+      color: #fff;
+      padding: 90px 5% 80px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 5px 14px; border-radius: 20px;
+      font-size: 0.8rem; letter-spacing: .05em;
+      margin-bottom: 24px;
+    }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; line-height: 1.2; margin-bottom: 20px; }
+    .hero p { font-size: 1.15rem; opacity: .85; max-width: 580px; margin: 0 auto 36px; }
+    .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-white {
+      background: #fff; color: var(--blue);
+      padding: 13px 28px; border-radius: 10px; font-weight: 700; font-size: .95rem;
+      transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 14px rgba(0,0,0,.15);
+    }
+    .btn-white:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.2); }
+    .btn-outline {
+      background: transparent; color: #fff;
+      border: 2px solid rgba(255,255,255,.5);
+      padding: 11px 26px; border-radius: 10px; font-weight: 600; font-size: .95rem;
+      transition: border-color .2s, background .2s;
+    }
+    .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,.1); }
+
+    /* STATS */
+    .stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1px; background: var(--border);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    }
+    .stat {
+      background: var(--white); padding: 28px 20px; text-align: center;
+    }
+    .stat-value { font-size: 2rem; font-weight: 800; color: var(--blue); }
+    .stat-label { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+
+    /* SECTIONS */
+    section { padding: 72px 5%; }
+    .section-label {
+      font-size: .75rem; font-weight: 700; letter-spacing: .1em;
+      color: var(--blue); text-transform: uppercase; margin-bottom: 10px;
+    }
+    .section-title { font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 800; margin-bottom: 14px; }
+    .section-sub { color: var(--muted); font-size: 1rem; max-width: 520px; margin-bottom: 44px; }
+    section.alt { background: #f8faff; }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;
+    }
+    .problem-card {
+      border: 1px solid var(--border); border-radius: 12px; padding: 24px;
+      background: #fff;
+    }
+    .problem-icon { font-size: 1.8rem; margin-bottom: 12px; }
+    .problem-card h3 { font-size: .95rem; font-weight: 700; margin-bottom: 6px; }
+    .problem-card p { font-size: .85rem; color: var(--muted); }
+
+    /* FEATURES */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;
+    }
+    .feature-card {
+      border: 1px solid var(--border); border-radius: 14px; padding: 28px;
+      background: #fff; transition: box-shadow .2s, transform .2s;
+    }
+    .feature-card:hover { box-shadow: 0 8px 30px rgba(29,78,216,.1); transform: translateY(-3px); }
+    .feature-icon {
+      width: 46px; height: 46px; border-radius: 12px;
+      background: var(--blue-light); display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin-bottom: 16px;
+    }
+    .feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { font-size: .875rem; color: var(--muted); }
+
+    /* WORKFLOW */
+    .workflow {
+      display: flex; flex-wrap: wrap; gap: 0; counter-reset: step;
+      position: relative;
+    }
+    .workflow-step {
+      flex: 1; min-width: 160px;
+      text-align: center; padding: 20px 16px;
+      position: relative;
+    }
+    .workflow-step::after {
+      content: '→';
+      position: absolute; right: -10px; top: 24px;
+      color: var(--blue); font-size: 1.2rem; font-weight: 700;
+    }
+    .workflow-step:last-child::after { display: none; }
+    .step-num {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--blue); color: #fff;
+      font-weight: 800; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 12px;
+    }
+    .step-title { font-size: .875rem; font-weight: 700; margin-bottom: 4px; }
+    .step-desc { font-size: .775rem; color: var(--muted); }
+
+    /* ROLES */
+    .roles-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;
+    }
+    .role-card {
+      border-radius: 14px; padding: 26px; text-align: center;
+    }
+    .role-card.manager  { background: #eff6ff; }
+    .role-card.head     { background: #f0fdf4; }
+    .role-card.admin    { background: #fef3c7; }
+    .role-emoji { font-size: 2.2rem; margin-bottom: 10px; }
+    .role-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .role-card p  { font-size: .82rem; color: var(--muted); }
+
+    /* TECH */
+    .tech-grid {
+      display: flex; flex-wrap: wrap; gap: 12px;
+    }
+    .tech-tag {
+      background: var(--blue-light); color: var(--blue);
+      border: 1px solid #bfdbfe;
+      padding: 8px 16px; border-radius: 20px; font-size: .85rem; font-weight: 600;
+    }
+
+    /* CREDENTIALS */
+    .cred-table {
+      width: 100%; border-collapse: collapse; font-size: .9rem;
+    }
+    .cred-table th {
+      text-align: left; padding: 10px 16px;
+      background: var(--blue-light); color: var(--blue);
+      font-weight: 700; font-size: .78rem; letter-spacing: .05em; text-transform: uppercase;
+    }
+    .cred-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .cred-table tr:last-child td { border-bottom: none; }
+    .badge {
+      display: inline-block; padding: 2px 10px; border-radius: 20px;
+      font-size: .75rem; font-weight: 600;
+    }
+    .badge-blue   { background: #dbeafe; color: #1d4ed8; }
+    .badge-green  { background: #dcfce7; color: #15803d; }
+    .badge-yellow { background: #fef9c3; color: #854d0e; }
+
+    /* CTA */
+    .cta {
+      background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+      color: #fff; text-align: center; padding: 80px 5%;
+    }
+    .cta h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; margin-bottom: 14px; }
+    .cta p { opacity: .8; margin-bottom: 36px; font-size: 1.05rem; }
+
+    /* FOOTER */
+    footer {
+      background: #0f172a; color: #94a3b8;
+      padding: 32px 5%; text-align: center; font-size: .85rem;
+    }
+    footer a { color: #60a5fa; }
+    footer a:hover { color: #93c5fd; }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .workflow-step::after { display: none; }
+      .workflow-step { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">ЦОД · КП</span>
+  <div class="nav-links">
+    <a href="#features">Функции</a>
+    <a href="#workflow">Процесс</a>
+    <a href="#roles">Роли</a>
+    <a href="#tech">Технологии</a>
+  </div>
+  <a class="nav-btn" href="https://github.com/dinanarova-source/cod-kp-system" target="_blank">
+    GitHub →
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">Внутренняя система · MVP v1.0</div>
+  <h1>Система управления<br>коммерческими предложениями ЦОД</h1>
+  <p>Формируйте КП из актуального прайс-листа за 15 минут вместо 3 часов. Подписание ЭЦП, согласование, отправка — всё в одном интерфейсе.</p>
+  <div class="hero-actions">
+    <a class="btn-white" href="https://github.com/dinanarova-source/cod-kp-system" target="_blank">Смотреть код на GitHub</a>
+    <a class="btn-outline" href="#workflow">Как это работает</a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-value">15 мин</div>
+    <div class="stat-label">Время подготовки КП</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">4 часа</div>
+    <div class="stat-label">Цикл согласования</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">40+</div>
+    <div class="stat-label">Позиций в каталоге</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">6</div>
+    <div class="stat-label">Разделов услуг</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">&lt;1%</div>
+    <div class="stat-label">Ошибок в ценах</div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section>
+  <div class="section-label">Проблема</div>
+  <div class="section-title">Как было раньше</div>
+  <p class="section-sub">Менеджеры тратили 2–3 часа на формирование КП вручную, а согласование занимало до 5 дней.</p>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="problem-icon">📋</div>
+      <h3>Устаревшие прайсы</h3>
+      <p>Excel-файлы в разных версиях у разных менеджеров — ошибки в ценах в ~15% КП</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">⏳</div>
+      <h3>Долгое согласование</h3>
+      <p>Согласование по email без трекинга статуса занимало 2–5 рабочих дней</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">🗂️</div>
+      <h3>Нет реестра</h3>
+      <p>Отсутствие единого реестра — невозможно отследить статус КП или найти нужный документ</p>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">✍️</div>
+      <h3>Ручная работа</h3>
+      <p>3 часа на форматирование Word-документа с нуля для каждого нового клиента</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="alt" id="features">
+  <div class="section-label">Решение</div>
+  <div class="section-title">Ключевые возможности</div>
+  <p class="section-sub">Полный цикл от выбора услуг до отправки подписанного PDF клиенту.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📦</div>
+      <h3>Каталог услуг</h3>
+      <p>6 разделов: Колокация, IaaS, Сеть, Резервное копирование, ИБ, Поддержка. Поиск по названию и описанию. НДС 12% рассчитывается автоматически.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🛒</div>
+      <h3>Корзина</h3>
+      <p>Добавляйте услуги с указанием количества. Редактирование, удаление, мгновенный расчёт итоговой суммы с НДС.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📄</div>
+      <h3>Генерация PDF</h3>
+      <p>Автоматическая генерация КП с фирменным бланком, таблицей позиций и уникальным номером в формате КП-ГГГГ-ММ-ДД-XXX.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✅</div>
+      <h3>Подпись ЭЦП</h3>
+      <p>Интеграция с NCALayer — казахстанский стандарт электронной цифровой подписи НУЦ РК. Менеджер и руководитель подписывают по очереди.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔄</div>
+      <h3>Workflow согласования</h3>
+      <p>5 статусов с трекингом. Руководитель одобряет или отклоняет с комментарием. История всех изменений сохраняется.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>Реестр КП</h3>
+      <p>Единый список всех предложений с фильтрацией по статусу, клиенту, менеджеру. Скачивание PDF, повторная отправка.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚙️</div>
+      <h3>Управление прайсом</h3>
+      <p>Администратор обновляет цены, добавляет новые и архивирует устаревшие позиции. Менеджеры всегда видят актуальный каталог.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔐</div>
+      <h3>Роли и безопасность</h3>
+      <p>RBAC: менеджер, руководитель, администратор. JWT-авторизация. Каждый видит только своё — менеджер только свои КП.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section id="workflow">
+  <div class="section-label">Процесс</div>
+  <div class="section-title">5 шагов от выбора до отправки</div>
+  <p class="section-sub">Полный цикл согласования и подписания без единого письма по email.</p>
+  <div class="workflow">
+    <div class="workflow-step">
+      <div class="step-num">1</div>
+      <div class="step-title">Каталог</div>
+      <div class="step-desc">Менеджер выбирает услуги и добавляет в корзину</div>
+    </div>
+    <div class="workflow-step">
+      <div class="step-num">2</div>
+      <div class="step-title">Оформление КП</div>
+      <div class="step-desc">Заполняет карточку клиента, система генерирует PDF</div>
+    </div>
+    <div class="workflow-step">
+      <div class="step-num">3</div>
+      <div class="step-title">Подпись ЭЦП</div>
+      <div class="step-desc">Менеджер подписывает документ через NCALayer</div>
+    </div>
+    <div class="workflow-step">
+      <div class="step-num">4</div>
+      <div class="step-title">Согласование</div>
+      <div class="step-desc">Руководитель подписывает или отклоняет с комментарием</div>
+    </div>
+    <div class="workflow-step">
+      <div class="step-num">5</div>
+      <div class="step-title">Отправка</div>
+      <div class="step-desc">Подписанный PDF уходит клиенту на email одной кнопкой</div>
+    </div>
+  </div>
+</section>
+
+<!-- ROLES -->
+<section class="alt" id="roles">
+  <div class="section-label">Пользователи</div>
+  <div class="section-title">Роли в системе</div>
+  <p class="section-sub">У каждого своя зона ответственности и свой набор функций.</p>
+  <div class="roles-grid">
+    <div class="role-card manager">
+      <div class="role-emoji">👩‍💼</div>
+      <h3>Менеджер по продажам</h3>
+      <p>Создаёт КП из каталога, подписывает ЭЦП, отправляет клиентам. Видит только свои КП.</p>
+    </div>
+    <div class="role-card manager">
+      <div class="role-emoji">👨‍💼</div>
+      <h3>Менеджер по сопровождению</h3>
+      <p>Обновляет КП действующих клиентов, выставляет счета на дополнительные услуги.</p>
+    </div>
+    <div class="role-card head">
+      <div class="role-emoji">👔</div>
+      <h3>Руководитель отдела</h3>
+      <p>Получает уведомления, просматривает и подписывает КП или отклоняет с причиной. Видит все КП отдела.</p>
+    </div>
+    <div class="role-card admin">
+      <div class="role-emoji">🔧</div>
+      <h3>Администратор прайса</h3>
+      <p>Ведёт актуальный каталог: обновляет цены, добавляет новые и архивирует устаревшие позиции.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TECH -->
+<section id="tech">
+  <div class="section-label">Стек</div>
+  <div class="section-title">Технологии</div>
+  <p class="section-sub">Современный стек для внутренней корпоративной системы.</p>
+
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px;">
+    <div>
+      <h3 style="margin-bottom:14px; font-size:.85rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);">Бэкенд</h3>
+      <div class="tech-grid">
+        <span class="tech-tag">Python 3.11</span>
+        <span class="tech-tag">FastAPI</span>
+        <span class="tech-tag">SQLAlchemy</span>
+        <span class="tech-tag">SQLite</span>
+        <span class="tech-tag">JWT Auth</span>
+        <span class="tech-tag">fpdf2</span>
+        <span class="tech-tag">Pydantic v2</span>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:14px; font-size:.85rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);">Фронтенд</h3>
+      <div class="tech-grid">
+        <span class="tech-tag">React 18</span>
+        <span class="tech-tag">TypeScript</span>
+        <span class="tech-tag">Vite</span>
+        <span class="tech-tag">Tailwind CSS</span>
+        <span class="tech-tag">Zustand</span>
+        <span class="tech-tag">React Router</span>
+        <span class="tech-tag">Axios</span>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:14px; font-size:.85rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);">Интеграции</h3>
+      <div class="tech-grid">
+        <span class="tech-tag">NCALayer ЭЦП</span>
+        <span class="tech-tag">SMTP Email</span>
+        <span class="tech-tag">REST API</span>
+        <span class="tech-tag">bcrypt</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CREDENTIALS -->
+<section class="alt">
+  <div class="section-label">Демо</div>
+  <div class="section-title">Тестовые аккаунты</div>
+  <p class="section-sub">Для тестирования системы после локального запуска.</p>
+  <div style="max-width:560px; border:1px solid var(--border); border-radius:14px; overflow:hidden;">
+    <table class="cred-table">
+      <thead>
+        <tr>
+          <th>Роль</th>
+          <th>Email</th>
+          <th>Пароль</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-blue">Менеджер</span></td>
+          <td style="font-family:monospace">manager@cod.kz</td>
+          <td style="font-family:monospace">manager123</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-blue">Менеджер 2</span></td>
+          <td style="font-family:monospace">manager2@cod.kz</td>
+          <td style="font-family:monospace">manager123</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-green">Руководитель</span></td>
+          <td style="font-family:monospace">head@cod.kz</td>
+          <td style="font-family:monospace">head123</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-yellow">Администратор</span></td>
+          <td style="font-family:monospace">admin@cod.kz</td>
+          <td style="font-family:monospace">admin123</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2>Готово к запуску</h2>
+  <p>Весь исходный код открыт на GitHub. Запустите локально за 5 минут.</p>
+  <div class="hero-actions">
+    <a class="btn-white" href="https://github.com/dinanarova-source/cod-kp-system" target="_blank">
+      Открыть репозиторий
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>
+    ЦОД — Система управления КП ·
+    <a href="https://github.com/dinanarova-source/cod-kp-system" target="_blank">GitHub</a>
+  </p>
+  <p style="margin-top:8px; font-size:.78rem; opacity:.6;">React · FastAPI · SQLAlchemy · Tailwind CSS</p>
+</footer>
+
+</body>
+</html>
